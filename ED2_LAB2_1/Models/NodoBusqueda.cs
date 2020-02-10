@@ -5,37 +5,36 @@ using System.Threading.Tasks;
 
 namespace ED2_LAB2_1.Models
 {
-    public class Nodo
+    public class NodoBusqueda
     {
         //Hijos
-        public List<Nodo> edges { get; private set; }
+        public List<NodoBusqueda> edges { get; private set; }
         //Llaves del arbol
-        public List<int> keys { get; private set; }
-        public Nodo parent { get; set; }
+        public List<string> keys { get; private set; }
+        public NodoBusqueda parent { get; set; }
 
-        public Nodo(int key)
+        public NodoBusqueda(string key)
         {
-            keys = new List<int>();
+            keys = new List<string>();
             keys.Add(key);
-            edges = new List<Nodo>();
+            edges = new List<NodoBusqueda>();
         }
-
-        public int Key(int x)
+        public int Key(string x)
         {
-            for(int y = 0; y < keys.Count; y++) 
+            for (int y = 0; y < keys.Count; y++)
             {
-                if(keys[y] == x)
+                if (keys[y].CompareTo(x) == 0)
                 {
-                    return y;
+                    return 1;
                 }
             }
             return -1;
         }
-        public void InsertEdge(Nodo edge)
+        public void InsertEdge(NodoBusqueda edge)
         {
-            for(int x = 0; x < edges.Count; x++)
+            for (int x = 0; x < edges.Count; x++)
             {
-                if(edges[x].keys[0] > edge.keys[0])
+                if (edges[x].keys[0].CompareTo(edge.keys[0]) > 0)
                 {
                     edges.Insert(x, edge);
                     return;
@@ -44,9 +43,9 @@ namespace ED2_LAB2_1.Models
             edges.Add(edge);
             edge.parent = this;
         }
-        public Nodo GetEdge(int pos)
+        public NodoBusqueda GetEdge(int pos)
         {
-            if(pos < edges.Count)
+            if (pos < edges.Count)
             {
                 return edges[pos];
             }
@@ -55,14 +54,14 @@ namespace ED2_LAB2_1.Models
                 return null;
             }
         }
-        public int FindEdgePosition(int k)
+        public int FindEdgePosition(string k)
         {
-            if(keys.Count != 0)
+            if (keys.Count != 0)
             {
-                int left = 0;
-                for(int x = 0; x <keys.Count; x++)
+                string left = " ";
+                for (int x = 0; x < keys.Count; x++)
                 {
-                    if(left <= k && k < keys[x])
+                    if (left.CompareTo(k) < 0 && k.CompareTo(keys[x]) < 0)
                     {
                         return x;
                     }
@@ -71,7 +70,7 @@ namespace ED2_LAB2_1.Models
                         left = keys[x];
                     }
                 }
-                if(k > keys[keys.Count - 1])
+                if (k.CompareTo(keys[keys.Count - 1]) > 0)
                 {
                     return keys.Count;
                 }
@@ -85,7 +84,7 @@ namespace ED2_LAB2_1.Models
                 return 0;
             }
         }
-        public void Fuse(Nodo n1)
+        public void Fuse(NodoBusqueda n1)
         {
             int totalkeys = n1.keys.Count;
             int totaledges = n1.edges.Count;
@@ -93,23 +92,23 @@ namespace ED2_LAB2_1.Models
             totalkeys += this.keys.Count;
             totaledges += this.edges.Count;
 
-            if(totalkeys > 5)
+            if (totalkeys > 5)
             {
                 throw new InvalidOperationException("Total keys of all nodes exceeded 5");
             }
 
-            if(totaledges > 6)
+            if (totaledges > 6)
             {
                 throw new InvalidOperationException("Total edges of all nodes exceeded 6");
             }
 
-            for(int x = 0; x < n1.keys.Count; x++)
+            for (int x = 0; x < n1.keys.Count; x++)
             {
-                int k = n1.keys[x];
+                string k = n1.keys[x];
                 this.Push(k);
             }
         }
-        public void Fuse(Nodo n1, Nodo n2)
+        public void Fuse(NodoBusqueda n1, NodoBusqueda n2)
         {
             int totalkeys = n1.keys.Count;
             int totaledges = n1.edges.Count;
@@ -132,18 +131,18 @@ namespace ED2_LAB2_1.Models
             this.Fuse(n1);
             this.Fuse(n2);
         }
-        public Nodo[] Split()
+        public NodoBusqueda[] Split()
         {
-            if(keys.Count != 4)
+            if (keys.Count != 4)
             {
                 throw new InvalidOperationException(string.Format("This node has {0} keys, can only split a 4 keys node", keys.Count));
             }
-            Nodo new_right = new Nodo(keys[1]);
-            for(int x = 4; x < edges.Count; x++)
+            NodoBusqueda new_right = new NodoBusqueda(keys[1]);
+            for (int x = 4; x < edges.Count; x++)
             {
                 new_right.edges.Add(this.edges[x]);
             }
-            for(int x = edges.Count - 1 ; x >= 4; x--)
+            for (int x = edges.Count - 1; x >= 4; x--)
             {
                 this.edges.RemoveAt(x);
             }
@@ -151,38 +150,38 @@ namespace ED2_LAB2_1.Models
             {
                 keys.RemoveAt(x);
             }
-            return new Nodo[] { this, new_right };
+            return new NodoBusqueda[] { this, new_right };
         }
-        public int? Pop(int pos)
+        public string Pop(int pos)
         {
-            if(keys.Count == 1)
+            if (keys.Count == 1)
             {
                 throw new InvalidOperationException("Cannot pop value from a 1 key node");
             }
-            if(pos < keys.Count)
+            if (pos < keys.Count)
             {
-                int k = keys[pos];
+                string k = keys[pos];
                 keys.RemoveAt(pos);
                 return k;
             }
             return null;
         }
-        public void Push(int k)
+        public void Push(string k)
         {
-            if(keys.Count == 5)
+            if (keys.Count == 5)
             {
                 throw new InvalidOperationException("Cannot push value from a 5 key node");
             }
-            if(keys.Count == 0)
+            if (keys.Count == 0)
             {
                 keys.Add(k);
             }
             else
             {
-                int left = 0;
-                for(int x = 0; x < keys.Count; x++)
+                string left = " ";
+                for (int x = 0; x < keys.Count; x++)
                 {
-                    if(left <= k && k < keys[x])
+                    if (left.CompareTo(k) < 0 && k.CompareTo(keys[x]) < 0)
                     {
                         keys.Insert(x, k);
                         return;
@@ -195,11 +194,11 @@ namespace ED2_LAB2_1.Models
                 keys.Add(k);
             }
         }
-        public Nodo Traverse(int k)
+        public NodoBusqueda Traverse(string k)
         {
             int pos = FindEdgePosition(k);
 
-            if(pos < edges.Count && pos > -1)
+            if (pos < edges.Count && pos > -1)
             {
                 return edges[pos];
             }
@@ -209,4 +208,5 @@ namespace ED2_LAB2_1.Models
             }
         }
     }
- }
+}
+
